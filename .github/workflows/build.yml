@@ -1,0 +1,140 @@
+name: Build Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build-windows:
+    runs-on: windows-latest
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.11'
+        
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install pyinstaller
+        if (Test-Path requirements.txt) {
+          pip install -r requirements.txt
+        }
+    
+    - name: Build Windows executable with icon
+      run: |
+        # 检查图标文件是否存在
+        if (Test-Path "logo-hdmi.ico") {
+          echo "Using logo.ico as icon"
+          pyinstaller --onefile --icon=logo-hdmi.ico openfirewall.py
+        } else {
+          echo "No logo.ico found, building without icon"
+          pyinstaller --onefile openfirewall.py
+        }
+        
+    - name: Show build results
+      run: |
+        echo "Windows build completed!"
+        if (Test-Path dist) {
+          Get-ChildItem -Path dist
+        }
+        
+    - name: Upload Windows artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: windows-executable
+        path: dist/
+        retention-days: 5
+
+  build-macos:
+    runs-on: macos-latest
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.11'
+        
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install pyinstaller
+        if [ -f requirements.txt ]; then 
+          pip install -r requirements.txt
+        fi
+    
+    - name: Build macOS executable
+      run: |
+        # 检查图标文件是否存在
+        if [ -f "logo-hdmi.icns" ]; then
+          echo "Using logo-hdmi.icns as icon"
+          pyinstaller --onefile --icon=logo-hdmi.icns openfirewall.py
+        elif [ -f "logo-hdmi.ico" ]; then
+          echo "Using logo.ico as icon"
+          pyinstaller --onefile --icon=logo-hdmi.ico openfirewall.py
+        else
+          echo "No icon file found, building without icon"
+          pyinstaller --onefile openfirewall.py
+        fi
+        
+    - name: Show build results
+      run: |
+        echo "macOS build completed!"
+        if [ -d "dist" ]; then
+          ls -la dist/
+        fi
+        
+    - name: Upload macOS artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: macos-executable
+        path: dist/
+        retention-days: 5
+
+  create-release:
+    needs: [build-windows, build-macos]
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Download Windows artifacts
+      uses: actions/download-artifact@v4
+      with:
+        name: windows-executable
+        path: ./windows
+        
+    - name: Download macOS artifacts
+      uses: actions/download-artifact@v4
+      with:
+        name: macos-executable
+        path: ./macos
+        
+    - name: List downloaded files
+      run: |
+        echo "=== Windows files ==="
+        if [ -d "./windows" ]; then ls -la ./windows/; fi
+        echo "=== macOS files ==="
+        if [ -d "./macos" ]; then ls -la ./macos/; fi
+        
+    - name: Create Release
+      if: startsWith(github.ref, 'refs/tags/')
+      uses: softprops/action-gh-release@v1
+      with:
+        files: |
+          windows/*
+          macos/*
+        draft: false
+        prerelease: false
+        tag_name: ${{ github.ref_name }}
+        name: Release ${{ github.ref_name }}
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
