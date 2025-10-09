@@ -19,20 +19,24 @@
 
 ```json
 {
-    "ip": "xxx.xx.xx.xx",
+    "ip": "xx.xx.xx.xx",
     "name": "dyq",
-    "access_key_id": "xxxxx",
-    "access_key_secret": "xxxx"
+    "source_group_id": "xxxxxxxx",
+    "access_key_id": "xxxxxxx",
+    "access_key_secret": "xxxxx",
+    "role_arn": "xxxxx"
 }
 ```
 
 **配置项说明：**
 - `ip`: 需要放行的IP地址
 - `name`: 用户姓名
+- 'source_group_id': 安全组id
 - `access_key_id`: 访问密钥ID
 - `access_key_secret`: 访问密钥Secret
+- 'role_arn' : arm角色id
 
-> ⚠️ **安全提醒**：访问密钥请通过微信群询问师兄师姐。
+> ⚠️ **安全提醒**：除ip以外的配置项请通过微信群询问师兄师姐。
 
 ### 使用方法
 
@@ -46,7 +50,7 @@
 
 ```bash
 # 克隆项目
-git clone https://github.com/yourusername/your-repo.git
+git clone https://github.com/YuancongLiang/hdmi-openfirewall.git
 cd your-repo
 
 # 安装依赖
