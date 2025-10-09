@@ -60,7 +60,7 @@ macOS:
 ```bash
 # 克隆项目
 git clone https://github.com/YuancongLiang/hdmi-openfirewall.git
-cd your-repo
+cd hdmi-openfirewall
 
 # 安装依赖
 pip install -r requirements.txt
