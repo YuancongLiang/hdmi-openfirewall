@@ -31,10 +31,10 @@
 **配置项说明：**
 - `ip`: 需要放行的IP地址
 - `name`: 用户姓名
-- 'source_group_id': 安全组id
+- `source_group_id`: 安全组id
 - `access_key_id`: 访问密钥ID
 - `access_key_secret`: 访问密钥Secret
-- 'role_arn' : arm角色id
+- `role_arn` : arm角色id
 
 > ⚠️ **安全提醒**：除ip以外的配置项请通过微信群询问师兄师姐。
 
@@ -75,7 +75,6 @@ pyinstaller --onefile openfirewall.py
 
 - 程序运行时需要在同一目录下找到 `ip.json` 配置文件
 - 确保配置文件格式正确，否则程序可能无法正常启动
-- 建议定期更新访问密钥以保证安全性
 
 ## 🐛 问题反馈
 
