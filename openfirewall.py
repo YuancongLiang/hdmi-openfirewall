@@ -89,11 +89,11 @@ class firewall:
             ecsConfig.endpoint = 'ecs.cn-guangzhou.aliyuncs.com'
             # 初始化ECS Client。
             ecsClient = EcsClient(ecsConfig)
+            return ecsClient
         except Exception as error:
             # 错误 message
             print(error.message)
-
-        return ecsClient
+        
 
     @staticmethod
     def addrule(
@@ -139,6 +139,9 @@ class firewall:
             # 诊断地址
             print(error.data.get("Recommend"))
             UtilClient.assert_as_string(error.message)
+            print("按任意键退出...")
+            keyboard.read_key()  # 等待任意按键
+            os._exit(0)
 
 
 if __name__ == '__main__':
@@ -148,4 +151,5 @@ if __name__ == '__main__':
     config = ruleConfig(json_data)
 
     firewall.addrule(config)
+
 
